@@ -27,6 +27,9 @@ func main() {
 	dbconfig.SeedDB(database)
 
 	schedule := scheduler.NewScheduler(database, eventlistener)
+
+	stopCron := schedule.StartCron()
+	defer stopCron()
 	schedule.CheckEventsInInterval(ctx, time.Minute)
 
 	schedule.Schedule(
@@ -42,6 +45,13 @@ func main() {
 			RunAt:   time.Now().Add(2 * time.Minute),
 		})
 
+	schedule.ScheduleCron(
+		scheduler.Event{
+			Name:    "SendEmail",
+			Payload: "paybills: $4,000 bill",
+			Cron:    "1 * * * *",
+		},
+	)
 	go func() {
 		for range interrupt {
 			log.Println("\n❌ Interrupt received closing...")

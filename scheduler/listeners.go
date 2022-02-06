@@ -14,4 +14,5 @@ type Event struct {
 	Name    string
 	Payload string
 	RunAt   time.Time
+	Cron    string
 }
